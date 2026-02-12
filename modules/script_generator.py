@@ -19,7 +19,7 @@ def generate_sales_script(df: pd.DataFrame, api_key: str) -> str:
         Script de ventas generado
     """
     genai.configure(api_key=api_key)
-    model = genai.GenerativeModel('gemini-2.5-flash')
+    model = genai.GenerativeModel('gemini-2.0-flash')
 
     # Filtrar mejores conversaciones (score >= 4)
     if "agent_score_numeric" in df.columns:
@@ -113,7 +113,7 @@ def generate_script_by_use_case(df: pd.DataFrame, api_key: str, use_case: str) -
         Script específico
     """
     genai.configure(api_key=api_key)
-    model = genai.GenerativeModel('gemini-2.5-flash')
+    model = genai.GenerativeModel('gemini-2.0-flash')
 
     # Filtrar por caso de uso
     if "use_case" in df.columns:

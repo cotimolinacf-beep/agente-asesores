@@ -17,7 +17,7 @@ class ResponseComparator:
         api_key: str,
         sales_script: str = "",
         knowledge_base: str = "",
-        model: str = "gemini-2.5-flash"
+        model: str = "gemini-2.0-flash"
     ):
         """
         Inicializa el comparador.
@@ -139,7 +139,7 @@ Responde SOLO con el texto de la respuesta.
 
         try:
             response = self.model.generate_content(prompt)
-            time.sleep(1)
+            time.sleep(0.5)
             return response.text.strip()
         except Exception as e:
             return f"Error: {str(e)}"
@@ -188,7 +188,7 @@ Responde SOLO con JSON:
         try:
             response = self.model.generate_content(prompt)
             text = response.text.strip()
-            time.sleep(1)
+            time.sleep(0.5)
 
             json_match = re.search(r'\{[\s\S]*\}', text)
             if json_match:

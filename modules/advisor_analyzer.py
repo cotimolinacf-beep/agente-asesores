@@ -48,16 +48,17 @@ Responde ÚNICAMENTE con el JSON, sin texto adicional.
 class AdvisorAnalyzer:
     """Analizador de calidad de respuestas de asesores."""
 
-    def __init__(self, api_key: str, model: str = "gemini-2.5-flash"):
+    def __init__(self, api_key: str, model: str = "gemini-2.0-flash"):
         """
         Inicializa el analizador.
 
         Args:
             api_key: API Key de Google Gemini
-            model: Modelo a usar
+            model: Modelo a usar (default: gemini-2.0-flash para mejor velocidad)
         """
         genai.configure(api_key=api_key)
         self.model = genai.GenerativeModel(model)
+        self.delay = 0.5  # Delay entre llamadas API
 
     def _safe_str(self, val, max_len: int = 3000) -> str:
         """Convierte valor a string de forma segura."""
@@ -121,7 +122,7 @@ class AdvisorAnalyzer:
 
         try:
             response = self.model.generate_content(prompt)
-            time.sleep(1)  # Rate limiting
+            time.sleep(self.delay)  # Rate limiting
 
             result = self._extract_json(response.text)
             result["analysis_success"] = True

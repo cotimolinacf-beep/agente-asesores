@@ -19,7 +19,7 @@ def generate_knowledge_base(df: pd.DataFrame, api_key: str) -> str:
         Base de conocimiento generada
     """
     genai.configure(api_key=api_key)
-    model = genai.GenerativeModel('gemini-2.5-flash')
+    model = genai.GenerativeModel('gemini-2.0-flash')
 
     # Recopilar información de diferentes columnas
     key_topics = []
@@ -108,7 +108,7 @@ def extract_product_info(df: pd.DataFrame, api_key: str) -> dict:
         Diccionario con información de productos
     """
     genai.configure(api_key=api_key)
-    model = genai.GenerativeModel('gemini-2.5-flash')
+    model = genai.GenerativeModel('gemini-2.0-flash')
 
     # Recopilar topics relacionados con productos
     product_keywords = ['precio', 'modelo', 'característica', 'motor', 'color', 'versión']

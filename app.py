@@ -200,6 +200,34 @@ elif page == "analisis_asesores":
                         value=0
                     )
 
+                # Columnas a preservar del archivo original
+                st.markdown("#### Columnas a incluir del archivo original")
+
+                # Columnas recomendadas para preservar
+                recommended_cols = [
+                    "conversation_id",
+                    "historial_de_mensajes_en_bot",
+                    "historial_de_mensajes_en_asesor",
+                    "tipificacion",
+                    "company_name",
+                    "group_name",
+                    "user_name",
+                    "fecha_primer_mensaje",
+                    "tipo_origen"
+                ]
+
+                # Filtrar solo las que existen en el archivo
+                available_cols = [col for col in recommended_cols if col in df.columns]
+                other_cols = [col for col in df.columns if col not in recommended_cols]
+
+                # Selector de columnas
+                selected_cols = st.multiselect(
+                    "Selecciona columnas a conservar",
+                    options=df.columns.tolist(),
+                    default=available_cols,
+                    help="Estas columnas se incluirán junto con el análisis"
+                )
+
                 # Botón de análisis
                 if st.button("🚀 Iniciar Análisis", type="primary", use_container_width=True):
                     if not st.session_state.get("api_key"):
@@ -211,7 +239,7 @@ elif page == "analisis_asesores":
                         analyzer = AdvisorAnalyzer(st.session_state["api_key"])
 
                         # Preparar datos
-                        sample_df = df_with_advisor.iloc[start_from:]
+                        sample_df = df_with_advisor.iloc[start_from:].copy()
                         if sample_size > 0:
                             sample_df = sample_df.head(sample_size)
 
@@ -222,17 +250,33 @@ elif page == "analisis_asesores":
                         results = []
                         total = len(sample_df)
 
-                        for idx, (_, row) in enumerate(sample_df.iterrows()):
+                        for idx, (row_idx, row) in enumerate(sample_df.iterrows()):
                             status_text.text(f"Procesando {idx+1}/{total}...")
                             progress_bar.progress((idx + 1) / total)
 
-                            result = analyzer.analyze_conversation(row.to_dict())
-                            result["conversation_id"] = row["conversation_id"]
+                            # Analizar conversación
+                            analysis = analyzer.analyze_conversation(row.to_dict())
+
+                            # Combinar columnas originales con análisis
+                            result = {}
+
+                            # Primero las columnas seleccionadas del original
+                            for col in selected_cols:
+                                result[col] = row.get(col, "")
+
+                            # Luego las columnas del análisis
+                            for key, value in analysis.items():
+                                result[key] = value
+
                             results.append(result)
+
+                        # Crear DataFrame combinado
+                        results_df = pd.DataFrame(results)
 
                         # Guardar resultados en session state
                         st.session_state["analysis_results"] = results
-                        st.session_state["analysis_df"] = pd.DataFrame(results)
+                        st.session_state["analysis_df"] = results_df
+                        st.session_state["original_df"] = sample_df
 
                         status_text.text("✅ Análisis completado!")
 
